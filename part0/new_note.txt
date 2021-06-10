@@ -1,0 +1,17 @@
+https://www.websequencediagrams.com/
+
+title New Note
+
+note right of Browser: User writes note and presses submit button
+Browser->Server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+
+Browser->Server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+Server-->Browser: HTML
+
+Browser->Server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+Server-->Browser: main.js
+
+Browser->Server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+Server-->Browser: data.json
+
+note right of Browser: browser renders the data
