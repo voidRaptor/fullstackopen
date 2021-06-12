@@ -2,24 +2,25 @@ import React from 'react';
 
 
 const Header = (props) => {
+  return ( <h1>{props.course}</h1> )
+}
 
-  return (
-    <h1>{props.course}</h1>
-  )
 
+const Part = (props) => {
+  return ( <p>{props.title} {props.count}</p> )
 }
 
 
 const Content = (props) => {
 
   return (
-    <>
+    <div>
       {
         props.contents.map((item, index) => (
-          <p key={index}>{item[0]} {item[1]}</p>
+          <Part key={index} title={item[0]} count={item[1]} />
         ))
       }
-    </>
+    </div>
   )
 
 }
@@ -32,10 +33,7 @@ const Total = (props) => {
     total += props.items[i][1];
   }
 
-  return (
-    <p>Number of exercises {total}</p>
-  )
-
+  return ( <p>Number of exercises {total}</p> )
 }
 
 
