@@ -14,12 +14,25 @@ const FeedbackForm = (props) => {
 
 
 const Statistics = (props) => {
+
+  const countSum = (values) => values.reduce((a, b) => a + b, 0)
+
+  const countAverage = (values) => countSum(values) === 0 ? 0 : (values[0] - values[2]) / countSum(values)
+
+  const countPositiveRatio = (values) => countSum(values) === 0 ? 0 : values[0] / countSum(values) * 100
+
+
   return (
     <>
       <h1>statistics</h1>
+
       <p>good {props.values[0]}</p>
       <p>neutral {props.values[1]}</p>
       <p>bad {props.values[2]}</p>
+
+      <p>all {countSum(props.values)}</p>
+      <p>average {countAverage(props.values)}</p>
+      <p>positive {countPositiveRatio(props.values)} %</p>
     </>
   )
 }
