@@ -1,14 +1,29 @@
 import React, { useState } from 'react'
 
 
+const Button = ({handler, text}) => {
+  return (
+    <button onClick={handler}> {text} </button>
+  )
+}
+
+
 const FeedbackForm = (props) => {
   return (
     <>
       <h1>give feedback</h1>
-      <button onClick={props.setters[0]}> good </button>
-      <button onClick={props.setters[1]}> neutral </button>
-      <button onClick={props.setters[2]}> bad </button>
+      <Button handler={props.setters[0]} text="good" />
+      <Button handler={props.setters[1]} text="neutral" />
+      <Button handler={props.setters[2]} text="bad" />
     </>
+  )
+}
+
+
+
+const StatisticLine = ({text, value}) => {
+  return (
+    <p>{text} {value}</p>
   )
 }
 
@@ -32,13 +47,13 @@ const Statistics = ({values}) => {
       <>
         <h1>statistics</h1>
 
-        <p>good {values[0]}</p>
-        <p>neutral {values[1]}</p>
-        <p>bad {values[2]}</p>
+        <StatisticLine text="good" value={values[0]} />
+        <StatisticLine text="neutral" value={values[1]} />
+        <StatisticLine text="bad" value={values[2]} />
 
-        <p>all {sum}</p>
-        <p>average {avg}</p>
-        <p>positive {posRatio} %</p>
+        <StatisticLine text="all" value={sum} />
+        <StatisticLine text="average" value={avg} />
+        <StatisticLine text="positive" value={posRatio.toString() + " %"} />
       </>
     )
   }
