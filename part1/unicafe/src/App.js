@@ -13,28 +13,35 @@ const FeedbackForm = (props) => {
 }
 
 
-const Statistics = (props) => {
+const Statistics = ({values}) => {
 
-  const countSum = (values) => values.reduce((a, b) => a + b, 0)
+  const sum = values.reduce((a, b) => a + b, 0)
+  const avg = sum === 0 ? 0 : (values[0] - values[2]) / sum
+  const posRatio = sum === 0 ? 0 : values[0] / sum * 100
 
-  const countAverage = (values) => countSum(values) === 0 ? 0 : (values[0] - values[2]) / countSum(values)
+  if (sum === 0) {
+    return (
+      <>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </>
+    )
 
-  const countPositiveRatio = (values) => countSum(values) === 0 ? 0 : values[0] / countSum(values) * 100
+  } else {
+    return (
+      <>
+        <h1>statistics</h1>
 
+        <p>good {values[0]}</p>
+        <p>neutral {values[1]}</p>
+        <p>bad {values[2]}</p>
 
-  return (
-    <>
-      <h1>statistics</h1>
-
-      <p>good {props.values[0]}</p>
-      <p>neutral {props.values[1]}</p>
-      <p>bad {props.values[2]}</p>
-
-      <p>all {countSum(props.values)}</p>
-      <p>average {countAverage(props.values)}</p>
-      <p>positive {countPositiveRatio(props.values)} %</p>
-    </>
-  )
+        <p>all {sum}</p>
+        <p>average {avg}</p>
+        <p>positive {posRatio} %</p>
+      </>
+    )
+  }
 }
 
 
