@@ -19,11 +19,22 @@ const App = () => {
   ]
 
   const [selected, setSelected] = useState(0)
+  const [points, setPoints] = useState( Array(anecdotes.length).fill(0) )
+
+  const vote = (index) => {
+    const copy = [...points]
+    copy[index] += 1
+    setPoints(copy)
+  }
+
 
   return (
     <div>
-      <p>{anecdotes[selected]} </p>
-      <button onClick={() => setSelected( randomMixMax(0, anecdotes.length-1) )}>next </button>
+      <p>{anecdotes[selected]}</p>
+      <p>has {points[selected]} votes</p>
+
+      <button onClick={() => vote(selected)}>vote </button>
+      <button onClick={() => setSelected( randomMixMax(0, anecdotes.length-1) )} >next</button>
     </div>
   )
 }
