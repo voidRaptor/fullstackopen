@@ -13,8 +13,16 @@ const App = () => {
   const onSubmit = (event) => {
     event.preventDefault() // prevent redirection
 
-    setPersons(persons.concat( [{name: newName}] ))
-    console.log(persons)
+    const person = {name: newName}
+
+    if (persons.some(item => item.name === person.name)) {
+      alert(`"${newName}" is already added to phonebook`)
+
+    } else {
+      setPersons(persons.concat( [person] ))
+    }
+
+
   }
 
   return (
