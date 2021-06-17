@@ -1,6 +1,71 @@
 import React, { useState, useEffect } from 'react'
 
 
+const Filter = ({filterSetter, filter}) => {
+
+  const onFilterChange = (event) => {
+    filterSetter(event.target.value)
+  }
+
+  return (
+    <>
+      filter shown with <input onChange={onFilterChange} value={filter}/>
+    </>
+  )
+}
+
+
+const PersonForm = ({setters, values}) => {
+
+  const onSubmit = (event) => {
+    event.preventDefault() // prevent redirection
+
+    const person = {name: values["name"], number: values["number"]}
+
+    if (values["persons"].some(item => item.name === person.name)) {
+      alert(`"${values["name"]}" is already added to phonebook`)
+
+    } else {
+      setters["persons"](values["persons"].concat( [person] ))
+    }
+
+  }
+
+
+  const onNameChange = (event) => {
+    setters["name"](event.target.value)
+  }
+
+  const onNumberChange = (event) => {
+    setters["number"](event.target.value)
+  }
+
+
+  return (
+    <>
+      <form onSubmit={onSubmit} >
+        <div> name: <input onChange={onNameChange} value={values["name"]}/> </div>
+        <div> number: <input onChange={onNumberChange} value={values["number"]}/> </div>
+        <div>
+          <button type="submit">add</button>
+        </div>
+      </form>
+    </>
+  )
+}
+
+
+const NumberList = ({filterResults}) => {
+  return (
+    <>
+      {
+        filterResults.map(item => <p key={item.name}>{item.name} {item.number}</p>)
+      }
+    </>
+  )
+}
+
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
@@ -14,64 +79,29 @@ const App = () => {
   const [ filter, setFilter ] = useState('')
 
 
-  const onNameChange = (event) => {
-    setNewName(event.target.value)
-  }
-
-  const onNumberChange = (event) => {
-    setNewNumber(event.target.value)
-  }
-
-  const onFilterChange = (event) => {
-    setFilter(event.target.value)
-  }
-
-
   // Setting the state is async and last inputted char might not be included in event.
   // This is called after the state is set.
   useEffect(() => {
     // case insensitive
     const filtered = persons.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()))
-    console.log(filter, filtered)
     setFilterResults(filtered)
 
   }, [filter, persons])
 
-  const onSubmit = (event) => {
-    event.preventDefault() // prevent redirection
-
-    const person = {name: newName, number: newNumber}
-
-    if (persons.some(item => item.name === person.name)) {
-      alert(`"${newName}" is already added to phonebook`)
-
-    } else {
-      setPersons(persons.concat( [person] ))
-    }
-
-
-  }
+  const setters = {"name": setNewName, "number": setNewNumber, "persons": setPersons}
+  const values = {"name": newName, "number": newNumber, "persons": persons}
 
   return (
     <div>
-      <h2>Phonebook</h2>
-      <div>
-      filter shown with <input onChange={onFilterChange} value={filter}/>
-      </div>
+      <h1>Phonebook</h1>
+
+      <Filter filterSetter={setFilter} filter={filter}/>
 
       <h2>Add new</h2>
-      <form onSubmit={onSubmit} >
-        <div> name: <input onChange={onNameChange} value={newName}/> </div>
-        <div> number: <input onChange={onNumberChange} value={newNumber}/> </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+      <PersonForm setters={setters} values={values}/>
 
       <h2>Numbers</h2>
-      {
-        filterResults.map(item => <p key={item.name}>{item.name} {item.number}</p>)
-      }
+      <NumberList filterResults={filterResults}/>
     </div>
   )
 
