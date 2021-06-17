@@ -1,51 +1,21 @@
 import React, { useState, useEffect } from 'react'
 
 
-const Filter = ({filterSetter, filter}) => {
-
-  const onFilterChange = (event) => {
-    filterSetter(event.target.value)
-  }
-
+const Filter = ({handler, filter}) => {
   return (
     <>
-      filter shown with <input onChange={onFilterChange} value={filter}/>
+      filter shown with <input onChange={handler} value={filter}/>
     </>
   )
 }
 
 
-const PersonForm = ({setters, values}) => {
-
-  const onSubmit = (event) => {
-    event.preventDefault() // prevent redirection
-
-    const person = {name: values["name"], number: values["number"]}
-
-    if (values["persons"].some(item => item.name === person.name)) {
-      alert(`"${values["name"]}" is already added to phonebook`)
-
-    } else {
-      setters["persons"](values["persons"].concat( [person] ))
-    }
-
-  }
-
-
-  const onNameChange = (event) => {
-    setters["name"](event.target.value)
-  }
-
-  const onNumberChange = (event) => {
-    setters["number"](event.target.value)
-  }
-
-
+const PersonForm = ({handlers, values}) => {
   return (
     <>
-      <form onSubmit={onSubmit} >
-        <div> name: <input onChange={onNameChange} value={values["name"]}/> </div>
-        <div> number: <input onChange={onNumberChange} value={values["number"]}/> </div>
+      <form onSubmit={handlers["submit"]} >
+        <div> name: <input onChange={handlers["name"]} value={values["name"]}/> </div>
+        <div> number: <input onChange={handlers["number"]} value={values["number"]}/> </div>
         <div>
           <button type="submit">add</button>
         </div>
@@ -88,17 +58,48 @@ const App = () => {
 
   }, [filter, persons])
 
-  const setters = {"name": setNewName, "number": setNewNumber, "persons": setPersons}
-  const values = {"name": newName, "number": newNumber, "persons": persons}
+
+  const onFilterChange = (event) => {
+    setFilter(event.target.value)
+  }
+
+
+  const onSubmit = (event) => {
+    event.preventDefault() // prevent redirection
+
+    const person = {name: newName, number: newNumber}
+
+    if (persons.some(item => item.name === person.name)) {
+      alert(`"${newName}" is already added to phonebook`)
+
+    } else {
+      setPersons(persons.concat( [person] ))
+    }
+
+  }
+
+
+  const onNameChange = (event) => {
+    setNewName(event.target.value)
+  }
+
+
+  const onNumberChange = (event) => {
+    setNewNumber(event.target.value)
+  }
+
+
+  const handlers = {"name": onNameChange, "number": onNumberChange, "submit": onSubmit}
+  const values = {"name": newName, "number": newNumber}
 
   return (
     <div>
       <h1>Phonebook</h1>
 
-      <Filter filterSetter={setFilter} filter={filter}/>
+      <Filter handler={onFilterChange} filter={filter}/>
 
       <h2>Add new</h2>
-      <PersonForm setters={setters} values={values}/>
+      <PersonForm handlers={handlers} values={values}/>
 
       <h2>Numbers</h2>
       <NumberList filterResults={filterResults}/>
