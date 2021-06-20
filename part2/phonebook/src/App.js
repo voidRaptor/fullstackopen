@@ -6,8 +6,6 @@ const MessageBox = ({msg, level}) => {
 
   if (msg === null) return null
 
-
-
   return (
     <div className={level === "error" ? "error" : "info"}>
       {msg}
@@ -72,29 +70,29 @@ const App = () => {
   const [ message, setMessage ] = useState({text: "error", level: "error"})
 
 
+  // initial fetch
   useEffect(() => {
     personService
       .getAll()
       .then(data => {
         setPersons(data)
+        setFilterResults(data)
       })
 
   }, [])
 
 
-  // Setting the state is async and last inputted char might not be included in event.
-  // This is called after the state is set.
-  useEffect(() => {
-    // case insensitive
-    const filtered = persons.filter(item => item.name.toLowerCase().includes(filter.toLowerCase()))
+  const doFiltering = (filterStr) => {
+
+    // case insensitive, using value from event, since setFilter is async and has delay
+    const lowerCaseFilter = filterStr.toLowerCase()
+    const filtered = persons.filter(item => item.name.toLowerCase().includes(lowerCaseFilter))
     setFilterResults(filtered)
-
-  }, [filter, persons])
-
-
+  }
 
   const onFilterChange = (event) => {
     setFilter(event.target.value)
+    doFiltering(event.target.value)
   }
 
 
@@ -117,6 +115,10 @@ const App = () => {
             // update data for the previously updated person
             setPersons( persons.map(p => p.id !== existing.id ? p : data) )
             showMessage(`Updated ${newPerson.name}`, "info")
+          })
+          .catch(error => {
+            showMessage(`${newPerson.name} doesn't exist anymore`, "error")
+            setPersons( persons.map(p => p.id !== existing.id) )
           })
 
       }
@@ -151,9 +153,14 @@ const App = () => {
       personService
         .remove(item.id)
         .then(data => {
-          setPersons( persons.filter(element => element.id !== item.id) )
           showMessage(`Deleted ${item.name}`, "info")
         })
+        .catch(error => {
+          showMessage(`${item.name} doesn't exist anymore`, "error")
+        })
+
+        setPersons( persons.filter(element => element.id !== item.id) )
+        doFiltering(filter)
     }
 
   }
