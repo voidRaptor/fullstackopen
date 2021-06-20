@@ -81,6 +81,13 @@ const App = () => {
 
     } else {
       setPersons(persons.concat( [person] ))
+
+      // save on server
+      axios
+        .post("http://localhost:3001/persons", person)
+        .then(response => {
+          console.log(response)
+        })
     }
 
   }
