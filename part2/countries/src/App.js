@@ -11,11 +11,30 @@ const Filter = ({handler, filter}) => {
 }
 
 
-const CountryList = ({filterResults}) => {
+const CountryListItem = ({country, setFilter}) => {
+
+  const handler = event => {
+    console.log(country.name)
+    setFilter(country.name)
+  }
+
+
+  return (
+    <>
+      <p>
+        {country.name}
+        <button type="button" onClick={handler}>show</button>
+      </p>
+    </>
+  )
+}
+
+
+const CountryList = ({filterResults, setFilter}) => {
   return (
     <>
       {
-        filterResults.map(item => <p key={item.name}>{item.name}</p>)
+        filterResults.map(item => <CountryListItem key={item.name} country={item} setFilter={setFilter}/>)
       }
     </>
   )
@@ -31,9 +50,9 @@ const CountryData = ({country}) => {
 
       <h2>languages</h2>
       <ul>
-      {
-        country["languages"].map( (item, index) => <li key={index}>{item.name}</li> )
-      }
+        {
+          country["languages"].map( (item, index) => <li key={index}>{item.name}</li> )
+        }
       </ul>
 
       <img src={country["flag"]} alt={country["name"].concat(" flag")} width="200" height="200"/>
@@ -46,7 +65,6 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [ filterResults, setFilterResults ] = useState(countries)
   const [ filter, setFilter ] = useState('')
-
 
   useEffect(() => {
     axios
@@ -69,6 +87,7 @@ const App = () => {
   }, [filter, countries])
 
 
+
   const onFilterChange = (event) => {
     setFilter(event.target.value)
   }
@@ -89,11 +108,11 @@ const App = () => {
       <div>
         <Filter handler={onFilterChange} filter={filter}/>
 
-        <CountryList filterResults={filterResults}/>
+        <CountryList filterResults={filterResults} setFilter={setFilter}/>
       </div>
     )
 
-  } else if (filterResults.length === 1) {
+  } else {
 
     return (
       <div>
