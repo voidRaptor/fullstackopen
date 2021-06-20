@@ -26,11 +26,25 @@ const PersonForm = ({handlers, values}) => {
 }
 
 
-const NumberList = ({filterResults}) => {
+const ListItem = ({item, deleter}) => {
+
+  return (
+    <>
+      <p>
+        {item.name} {item.number}
+        <button type="button" onClick={() => deleter(item)}>delete</button>
+      </p>
+    </>
+  )
+
+}
+
+
+const NumberList = ({filterResults, deleter}) => {
   return (
     <>
       {
-        filterResults.map(item => <p key={item.name}>{item.name} {item.number}</p>)
+        filterResults.map(item => <ListItem key={item.name} item={item} deleter={deleter}/>)
       }
     </>
   )
@@ -102,6 +116,21 @@ const App = () => {
   }
 
 
+  const onDelete = (item) => {
+
+    if (window.confirm("delete?")) {
+
+      personService
+        .remove(item.id)
+        .then(data => {
+          setPersons( persons.filter(element => element.id !== item.id) )
+        })
+
+    }
+
+  }
+
+
   const handlers = {"name": onNameChange, "number": onNumberChange, "submit": onSubmit}
   const values = {"name": newName, "number": newNumber}
 
@@ -115,7 +144,7 @@ const App = () => {
       <PersonForm handlers={handlers} values={values}/>
 
       <h2>Numbers</h2>
-      <NumberList filterResults={filterResults}/>
+      <NumberList filterResults={filterResults} deleter={onDelete}/>
     </div>
   )
 
