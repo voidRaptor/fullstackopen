@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
 
 
 const Filter = ({handler, filter}) => {
@@ -46,11 +46,10 @@ const App = () => {
 
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then(response => {
-        //setPersons( persons.concat(response.data) )
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(data => {
+        setPersons(data)
       })
 
   }, [])
@@ -83,10 +82,10 @@ const App = () => {
       setPersons(persons.concat( [person] ))
 
       // save on server
-      axios
-        .post("http://localhost:3001/persons", person)
-        .then(response => {
-          console.log(response)
+      personService
+        .create(person)
+        .then(data => {
+          console.log(data)
         })
     }
 
