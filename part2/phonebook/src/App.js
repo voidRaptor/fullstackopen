@@ -27,7 +27,6 @@ const PersonForm = ({handlers, values}) => {
 
 
 const ListItem = ({item, deleter}) => {
-
   return (
     <>
       <p>
@@ -36,7 +35,6 @@ const ListItem = ({item, deleter}) => {
       </p>
     </>
   )
-
 }
 
 
@@ -89,8 +87,22 @@ const App = () => {
 
     const person = {name: newName, number: newNumber}
 
+    // update number
     if (persons.some(item => item.name === person.name)) {
-      alert(`"${newName}" is already added to phonebook`)
+
+      if (window.confirm(`"${newName}" is already added to phonebook, replace the number with a new one?`)) {
+
+        const existing = persons.find(p => p.name === newName)
+        const newPerson = {...existing, number: newNumber}
+
+        personService
+          .update(newPerson.id, newPerson)
+          .then(data => {
+            // update data for the previously updated person
+            setPersons( persons.map(p => p.id !== existing.id ? p : data) )
+          })
+
+      }
 
     } else {
       setPersons(persons.concat( [person] ))
