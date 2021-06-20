@@ -14,7 +14,6 @@ const Filter = ({handler, filter}) => {
 const CountryListItem = ({country, setFilter}) => {
 
   const handler = event => {
-    console.log(country.name)
     setFilter(country.name)
   }
 
@@ -41,7 +40,24 @@ const CountryList = ({filterResults, setFilter}) => {
 }
 
 
-const CountryData = ({country}) => {
+const WeatherData = ({weather}) => {
+  return (
+    <>
+      <p>
+        <b>temperature: </b>
+        {weather["current"]["temperature"]} celsius
+      </p>
+      <img src={weather["current"]["weather_icons"][0]} alt="weather icon" width="64" height="64"></img>
+      <p>
+        <b>wind: </b>
+        {weather["current"]["wind_speed"]} km/h direction {weather["current"]["wind_dir"]}
+      </p>
+    </>
+  )
+}
+
+
+const CountryData = ({country, weather}) => {
   return (
     <>
       <h1>{country["name"]}</h1>
@@ -56,6 +72,10 @@ const CountryData = ({country}) => {
       </ul>
 
       <img src={country["flag"]} alt={country["name"].concat(" flag")} width="200" height="200"/>
+
+
+      <h2>Weather in {country["capital"]}</h2>
+      {weather !== undefined && <WeatherData weather={weather} />}
     </>
   )
 }
@@ -65,13 +85,13 @@ const App = () => {
   const [countries, setCountries] = useState([])
   const [ filterResults, setFilterResults ] = useState(countries)
   const [ filter, setFilter ] = useState('')
+  const [ weather, setWeather ] = useState(undefined)
 
   useEffect(() => {
     axios
       .get("https://restcountries.eu/rest/v2/all")
       .then(response => {
         setCountries(response.data)
-        //console.log(response.data)
       })
 
   }, [])
@@ -85,6 +105,29 @@ const App = () => {
     setFilterResults(filtered)
 
   }, [filter, countries])
+
+
+  // fetch specific country's weather data
+  useEffect(() => {
+
+    if (filterResults.length === 1) {
+      const url = "http://api.weatherstack.com/current" +
+        "?access_key=" + process.env.REACT_APP_API_KEY +
+        "&query=" + filterResults[0].capital +
+        "&units=m"
+
+      axios
+        .get(url)
+        .then(response => {
+          setWeather(response.data)
+        })
+
+
+
+
+    }
+
+  }, [filterResults])
 
 
 
@@ -118,7 +161,7 @@ const App = () => {
       <div>
         <Filter handler={onFilterChange} filter={filter}/>
 
-      <CountryData country={filterResults[0]} />
+      <CountryData country={filterResults[0]} weather={weather} />
       </div>
     )
 
