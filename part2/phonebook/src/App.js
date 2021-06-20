@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
 
 
+const MessageBox = ({msg, level}) => {
+
+  if (msg === null) return null
+
+
+
+  return (
+    <div className={level === "error" ? "error" : "info"}>
+      {msg}
+    </div>
+  )
+}
+
+
 const Filter = ({handler, filter}) => {
   return (
     <>
@@ -55,6 +69,7 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
+  const [ message, setMessage ] = useState({text: "error", level: "error"})
 
 
   useEffect(() => {
@@ -75,6 +90,7 @@ const App = () => {
     setFilterResults(filtered)
 
   }, [filter, persons])
+
 
 
   const onFilterChange = (event) => {
@@ -100,6 +116,7 @@ const App = () => {
           .then(data => {
             // update data for the previously updated person
             setPersons( persons.map(p => p.id !== existing.id ? p : data) )
+            showMessage(`Updated ${newPerson.name}`, "info")
           })
 
       }
@@ -111,7 +128,7 @@ const App = () => {
       personService
         .create(person)
         .then(data => {
-          console.log(data)
+          showMessage(`Added ${person.name}`, "info")
         })
     }
 
@@ -130,17 +147,28 @@ const App = () => {
 
   const onDelete = (item) => {
 
-    if (window.confirm("delete?")) {
-
+    if (window.confirm("Delete?")) {
       personService
         .remove(item.id)
         .then(data => {
           setPersons( persons.filter(element => element.id !== item.id) )
+          showMessage(`Deleted ${item.name}`, "info")
         })
-
     }
 
   }
+
+
+  const showMessage = (text, level) => {
+    setMessage({text, level})
+
+    // hide after time period
+    setTimeout(() => {
+      setMessage({...message, text: null})
+    }, 3000)
+
+  }
+
 
 
   const handlers = {"name": onNameChange, "number": onNumberChange, "submit": onSubmit}
@@ -149,6 +177,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>
+
+      <MessageBox msg={message["text"]} level={message["level"]} />
 
       <Filter handler={onFilterChange} filter={filter}/>
 
