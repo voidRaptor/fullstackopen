@@ -6,6 +6,8 @@ const MessageBox = ({msg, level}) => {
 
   if (msg === null) return null
 
+
+
   return (
     <div className={level === "error" ? "error" : "info"}>
       {msg}
@@ -70,29 +72,34 @@ const App = () => {
   const [ message, setMessage ] = useState({text: "error", level: "error"})
 
 
-  // initial fetch
   useEffect(() => {
     personService
       .getAll()
       .then(data => {
         setPersons(data)
-        setFilterResults(data)
       })
 
   }, [])
 
 
-  const doFiltering = (filterStr) => {
+  // Setting the state is async and last inputted char might not be included in event.
+  // This is called after the state is set.
+  useEffect(() => {
+    // case insensitive
+    const filtered = persons.filter(item => {
+      console.log("item", item.name)
+      console.log("filter", filter)
+      return item.name.toLowerCase().includes(filter.toLowerCase())
+    })
 
-    // case insensitive, using value from event, since setFilter is async and has delay
-    const lowerCaseFilter = filterStr.toLowerCase()
-    const filtered = persons.filter(item => item.name.toLowerCase().includes(lowerCaseFilter))
     setFilterResults(filtered)
-  }
+
+  }, [filter, persons])
+
+
 
   const onFilterChange = (event) => {
     setFilter(event.target.value)
-    doFiltering(event.target.value)
   }
 
 
@@ -118,20 +125,25 @@ const App = () => {
           })
           .catch(error => {
             showMessage(`${newPerson.name} doesn't exist anymore`, "error")
-            setPersons( persons.map(p => p.id !== existing.id) )
+            setPersons( persons.filter(p => p.id !== existing.id) )
           })
 
       }
 
     } else {
-      setPersons(persons.concat( [person] ))
 
       // save on server
       personService
         .create(person)
         .then(data => {
           showMessage(`Added ${person.name}`, "info")
+          setPersons(persons.concat(data))
+          console.log("add", persons)
         })
+        .catch(error => {
+          showMessage(`Failed to add ${person.name}`, "error")
+        })
+
     }
 
   }
@@ -153,14 +165,16 @@ const App = () => {
       personService
         .remove(item.id)
         .then(data => {
+          setPersons( persons.filter(element => element.id !== item.id) )
           showMessage(`Deleted ${item.name}`, "info")
+
+          console.log("delete", persons)
         })
         .catch(error => {
-          showMessage(`${item.name} doesn't exist anymore`, "error")
+          setPersons( persons.filter(element => element.id !== item.id) )
+          showMessage(`${item.name} has already been deleted`, "error")
+          console.log("delete", persons)
         })
-
-        setPersons( persons.filter(element => element.id !== item.id) )
-        doFiltering(filter)
     }
 
   }
