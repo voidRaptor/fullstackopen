@@ -6,8 +6,6 @@ const MessageBox = ({msg, level}) => {
 
   if (msg === null) return null
 
-
-
   return (
     <div className={level === "error" ? "error" : "info"}>
       {msg}
@@ -69,7 +67,7 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [ filter, setFilter ] = useState('')
-  const [ message, setMessage ] = useState({text: "error", level: "error"})
+  const [ message, setMessage ] = useState({text: null, level: "info"})
 
 
   useEffect(() => {
@@ -87,9 +85,11 @@ const App = () => {
   useEffect(() => {
     // case insensitive
     const filtered = persons.filter(item => {
-      console.log("item", item.name)
-      console.log("filter", filter)
-      return item.name.toLowerCase().includes(filter.toLowerCase())
+      if (item) {
+        return item.name.toLowerCase().includes(filter.toLowerCase())
+      } else {
+        return false
+      }
     })
 
     setFilterResults(filtered)
@@ -137,8 +137,7 @@ const App = () => {
         .create(person)
         .then(data => {
           showMessage(`Added ${person.name}`, "info")
-          setPersons(persons.concat(data))
-          console.log("add", persons)
+          setPersons(persons.concat(person))
         })
         .catch(error => {
           showMessage(`Failed to add ${person.name}`, "error")
@@ -168,12 +167,10 @@ const App = () => {
           setPersons( persons.filter(element => element.id !== item.id) )
           showMessage(`Deleted ${item.name}`, "info")
 
-          console.log("delete", persons)
         })
         .catch(error => {
           setPersons( persons.filter(element => element.id !== item.id) )
           showMessage(`${item.name} has already been deleted`, "error")
-          console.log("delete", persons)
         })
     }
 
